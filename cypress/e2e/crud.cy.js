@@ -14,7 +14,10 @@ describe('CRUD Operations - 08 Inventory System', () => {
   it('creates a new item successfully', () => {
     cy.get('#btn-add-new').click();
     cy.get('#field-title').type('Test Product');
-    cy.get('#field-description, #field-content, #field-review, #field-notes').first().type('Test description for new item');
+    cy.get('#field-sku').type('SKU-NEW');
+    cy.get('#field-quantity').type('10');
+    cy.get('#field-price').type('29.99');
+    cy.get('#field-supplier').type('Test Supplier');
     cy.get('#btn-submit').click();
     cy.get('#page-products').should('not.have.class', 'hidden');
     cy.get('#products-list').should('contain', 'Test Product');
