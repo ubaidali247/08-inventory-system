@@ -1,5 +1,5 @@
-// CRUD Tests - Inventory System
-describe('CRUD Operations - Inventory System', () => {
+// CRUD Tests - 08 Inventory System
+describe('CRUD Operations - 08 Inventory System', () => {
   beforeEach(() => {
     cy.visit('/');
     cy.get('.nav-link[data-page="products"]').click();
@@ -105,7 +105,7 @@ describe('CRUD Operations - Inventory System', () => {
     cy.request({
       method: 'POST',
       url: '/api/products',
-      body: {"title":"Test Product","name":"Test Product","sku":"SKU-TEST","category":"Electronics","quantity":"50","price":"99.99","supplier":"Test Supplier","status":"in-stock"},
+      body: {"title": "Test Product", "sku": "SKU-TEST", "category": "Electronics", "quantity": "50", "price": "99.99", "supplier": "Test Supplier", "status": "in-stock"},
     }).its('status').should('eq', 201);
   });
 
