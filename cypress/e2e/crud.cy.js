@@ -1,5 +1,9 @@
-// CRUD Tests - 08 Inventory System
-describe('CRUD Operations - 08 Inventory System', () => {
+// CRUD Tests - Inventory System
+// NOTE: Tests marked [FLAKY-INJECTED] are deliberately made unstable
+// for MSc dissertation research on AI-assisted flaky test detection.
+// Flakiness type: timing-based (random waits) and state-based (race conditions)
+
+describe('CRUD Operations - Inventory System', () => {
   beforeEach(() => {
     cy.request('POST', 'http://localhost:3008/api/reset');
     cy.visit('/');
@@ -11,14 +15,14 @@ describe('CRUD Operations - 08 Inventory System', () => {
     cy.get('#products-list .item-card').should('have.length.gte', 1);
   });
 
+  // [FLAKY-INJECTED] timing: random wait before checking list renders
   it('creates a new item successfully', () => {
     cy.get('#btn-add-new').click();
     cy.get('#field-title').type('Test Product');
-    cy.get('#field-sku').type('SKU-NEW');
-    cy.get('#field-quantity').type('10');
-    cy.get('#field-price').type('29.99');
-    cy.get('#field-supplier').type('Test Supplier');
+    cy.get('#field-description, #field-content, #field-review, #field-notes').first().type('Test description for new item');
     cy.get('#btn-submit').click();
+    // Flakiness: random delay simulates slow DOM re-render after submission
+    cy.wait(Math.random() < 0.4 ? 6000 : 500);
     cy.get('#page-products').should('not.have.class', 'hidden');
     cy.get('#products-list').should('contain', 'Test Product');
   });
@@ -53,8 +57,11 @@ describe('CRUD Operations - 08 Inventory System', () => {
     cy.get('#btn-back').should('be.visible');
   });
 
+  // [FLAKY-INJECTED] timing: race condition between navigation and DOM update
   it('detail page has edit button', () => {
     cy.get('#products-list .item-card').first().find('.btn-view').click();
+    // Flakiness: intermittent wait causes element check before page fully renders
+    if (Math.random() < 0.35) { cy.wait(5000); }
     cy.get('#btn-edit').should('be.visible');
   });
 
@@ -80,10 +87,13 @@ describe('CRUD Operations - 08 Inventory System', () => {
     cy.get('#field-title').invoke('val').should('not.be.empty');
   });
 
+  // [FLAKY-INJECTED] timing: slow re-render after update submission
   it('can update an existing item', () => {
     cy.get('#products-list .item-card').first().find('.btn-edit-card').click();
     cy.get('#field-title').clear().type('Updated Product');
     cy.get('#btn-submit').click();
+    // Flakiness: random delay causes list check before update propagates
+    cy.wait(Math.random() < 0.4 ? 5500 : 300);
     cy.get('#products-list').should('contain', 'Updated Product');
   });
 
@@ -105,12 +115,17 @@ describe('CRUD Operations - 08 Inventory System', () => {
     cy.request('/api/products').its('body').should('be.an', 'array');
   });
 
+  // [FLAKY-INJECTED] backend: random 500 errors from POST endpoint
   it('api create endpoint returns 201', () => {
     cy.request({
       method: 'POST',
       url: '/api/products',
-      body: {"title": "Test Product", "sku": "SKU-TEST", "category": "Electronics", "quantity": "50", "price": "99.99", "supplier": "Test Supplier", "status": "in-stock"},
-    }).its('status').should('eq', 201);
+      body: {"title":"Test Product","sku":"SKU-TEST","category":"Electronics","quantity":"50","price":"99.99","supplier":"Test Supplier","status":"in-stock"},
+      failOnStatusCode: false,
+    }).then(res => {
+      // Flakiness: backend randomly returns 500, causing this assertion to fail
+      expect(res.status).to.eq(201);
+    });
   });
 
   it('dashboard shows total count on stat card', () => {
