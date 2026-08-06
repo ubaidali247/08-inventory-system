@@ -18,7 +18,10 @@ describe('CRUD Operations - Inventory System', () => {
   it('creates a new item successfully', () => {
     cy.get('#btn-add-new').click();
     cy.get('#field-title').type('Test Product');
-    cy.get('#field-description, #field-content, #field-review, #field-notes').first().type('Test description for new item');
+    cy.get('#field-sku').type('SKU-NEW-TEST');
+    cy.get('#field-quantity').type('25');
+    cy.get('#field-price').type('49.99');
+    cy.get('#field-supplier').type('Test Supplier');
     cy.get('#btn-submit').click();
     cy.get('#page-products').should('not.have.class', 'hidden');
     cy.get('#products-list').should('contain', 'Test Product');
@@ -28,6 +31,10 @@ describe('CRUD Operations - Inventory System', () => {
     const title = 'Unique Item ' + Date.now();
     cy.get('#btn-add-new').click();
     cy.get('#field-title').type(title);
+    cy.get('#field-sku').type('SKU-UNIQUE');
+    cy.get('#field-quantity').type('10');
+    cy.get('#field-price').type('19.99');
+    cy.get('#field-supplier').type('Supplier X');
     cy.get('#btn-submit').click();
     cy.get('#products-list').should('contain', title);
   });
